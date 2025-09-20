@@ -14,12 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 Route::get('/coba', function () {
-    return view('coba');
+    return view('staff_produksi.app');
 });
 
+//Staff PPIC
 Route::get('/produk', function () {
     return view('staff_ppic.produk');
 });
@@ -32,3 +33,23 @@ Route::get('/riwayat', function () {
     return view('staff_ppic.riwayat');
 });
 
+////Manajer
+Route::get('/riwayat', function () {
+    return view('staff_ppic.riwayat');
+});
+
+Route::get('/verifikasi', function () {
+    return view('manajer.verifikasi');
+});
+
+Route::get('/riwayat-manajer', function () {
+    return view('manajer.riwayat');
+});
+
+//Staff Produksi
+Route::get('/produksi', function () {
+    return view('staff_produksi.produksi');
+});
+Route::get('/laporan', function () {
+    return view('staff_produksi.laporan');
+});
