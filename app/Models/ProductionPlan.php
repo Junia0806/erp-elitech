@@ -22,9 +22,12 @@ class ProductionPlan extends Model
     ];
 
     // Relasi: Plan ini milik satu Product
-    public function product()
+    public function products()
     {
-        return $this->belongsTo(Product::class);
+        // Tambahkan 'production_item' sebagai argumen kedua
+        return $this->belongsToMany(Product::class, 'production_item')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
     }
 
     // Relasi: Plan ini dibuat oleh satu User

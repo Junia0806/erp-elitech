@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('production_plans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products');
             $table->foreignId('created_by')->constrained('users');
-            $table->integer('quantity');
             $table->enum('status', ['dibuat', 'menunggu_persetujuan', 'disetujui', 'ditolak'])->default('dibuat');
             $table->date('deadline')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users');

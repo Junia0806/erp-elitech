@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\ProductionPlan;
+use App\Models\ProductionOrder;
 
 class ProductionOrderSeeder extends Seeder
 {
@@ -13,24 +13,18 @@ class ProductionOrderSeeder extends Seeder
      */
     public function run(): void
     {
-        // Cari production plan yang sudah disetujui
+        // Cari production plan yang statusnya 'disetujui'
         $approvedPlan = ProductionPlan::where('status', 'disetujui')->first();
         
-        // Pastikan tabel kosong sebelum seeding
-        DB::table('production_orders')->delete();
+        // Kosongkan tabel untuk menghindari data duplikat
+        ProductionOrder::query()->delete();
 
         // Buat order hanya jika ada plan yang disetujui
         if ($approvedPlan) {
-            DB::table('production_orders')->insert([
-                [
-                    'production_plan_id' => $approvedPlan->id,
-                    'status' => 'menunggu', // Status awal order
-                    'quantity_actual' => null,
-                    'quantity_reject' => null,
-                    'completed_at' => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
+            ProductionOrder::create([
+                'production_plan_id' => $approvedPlan->id,
+                'status' => 'menunggu', // Status awal untuk order baru
+                'notes' => 'Order dibuat dari seeder, siap untuk produksi.',
             ]);
         }
     }

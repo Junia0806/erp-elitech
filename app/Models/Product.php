@@ -14,6 +14,9 @@ class Product extends Model
     // Relasi: Satu Product bisa memiliki banyak ProductionPlan
     public function productionPlans()
     {
-        return $this->hasMany(ProductionPlan::class);
+        // Tambahkan 'production_item' sebagai argumen kedua
+        return $this->belongsToMany(ProductionPlan::class, 'production_item')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
     }
 }
