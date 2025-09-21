@@ -14,16 +14,21 @@ class ChooseItemController extends Controller
     public function index()
     {
         // Mengambil seluruh data barang (Data hanya ditarik : Foto, nama, sku dan id_barang)
-        $product    = Product::all()
+        $products    = Product::all()
                     ->select('id', 'name', 'sku', 'image');
 
         // Back-end Mode: Keluarkan bentuk json
-        return response()->json($product, 200, [], JSON_PRETTY_PRINT);
+        // return response()->json($product, 200, [], JSON_PRETTY_PRINT);
 
         // Keluarkan data bersamaan dengan viewnya
-        // return view('view.name', compact('data'));
+        return view('staff_ppic.produk', compact('products'));
     }
 
+// public function index()
+// {
+//     $products = Product::select('id','name','sku','image')->get()->keyBy('id');
+//     return view('staff_ppic.produk', compact('products'));
+// }
     public function store(Request $request) // Penyimpanan Barang menggunakan session
     {
         $selectedItems = $request->input('products'); // Ambil data dari form POST - Bagian checklist"nya

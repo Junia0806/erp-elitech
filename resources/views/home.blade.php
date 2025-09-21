@@ -32,7 +32,7 @@
                 </div>
                 <h3 class="text-2xl font-bold text-slate-800 mb-2">Staff PPIC</h3>
                 <p class="text-slate-500 mb-8 flex-grow">Mengajukan rencana produksi, memantau stok, dan memastikan jadwal produksi berjalan lancar.</p>
-                <a href="/produk" class="w-full bg-sky-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors">
+                <a href="/ppic/choose-item" class="w-full bg-sky-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors">
                     Masuk sebagai PPIC
                 </a>
             </div>

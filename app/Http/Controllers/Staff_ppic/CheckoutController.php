@@ -24,17 +24,17 @@ class CheckoutController extends Controller
         // Hapus session setelah diambil agar tidak muncul lagi nanti (opsional)
         session()->forget('checkout_items');
 
-        // Keluarkan data barang yang dipilih dari $selected_items (Cari barangnya)
+        // Keluarkan data barang yang dipilih dari $selectedItems (Cari barangnya)
         // Data yang diperlukan : Nama Barang, SKU dan id_barang
-        $product = Product::whereIn('id', $selected_items)
+        $products = Product::whereIn('id', $selectedItems)
                             ->select('id', 'name', 'sku')
                             ->get();
         
         // Back-end Mode: Keluarkan bentuk json
-        return response()->json($product, 200, [], JSON_PRETTY_PRINT);
+        // return response()->json($product, 200, [], JSON_PRETTY_PRINT);
 
         // Keluarkan data bersamaan dengan viewnya
-        // return view('view.name', compact('product'));
+        return view('staff_ppic.detail-rencana', compact('products'));
     }
 
     public function store(Request $request)

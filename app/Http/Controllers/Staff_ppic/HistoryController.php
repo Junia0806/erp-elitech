@@ -13,14 +13,11 @@ class HistoryController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Buat query dasar untuk mengambil SEMUA ProductionPlan
-        // Eager load relasi untuk optimasi:
-        // - 'items.product': Mengambil item dalam rencana, dan detail produk untuk setiap item.
-        // - 'productionOrder': Mengambil data order yang terkait.
-                $query = ProductionPlan::with(['products', 'productionOrder', 'creator'])
+        // 1. Buat query dasar
+        $query = ProductionPlan::with(['products', 'productionOrder', 'creator'])
                                ->latest(); // Urutkan dari yang terbaru
 
-        // 2. Eksekusi query untuk mendapatkan keseluruhan data
+        // 2. Eksekusi query
         $plans = $query->get();
 
         // 3. Proses setiap plan untuk menambahkan kalkulasi progress
@@ -28,8 +25,9 @@ class HistoryController extends Controller
             $plan->progress = $this->calculateProductionProgress($plan);
         });
 
-        // 4. Kirim data yang sudah diproses ke view
-        return response()->json($plans, 200, [], JSON_PRETTY_PRINT);
+        // 4. (MODIFIKASI) Kirim data ke view Blade, bukan JSON.
+        // Ganti 'staff_ppic.history' dengan path view Anda jika berbeda.
+        return view('staff_ppic.riwayat', compact('plans'));
     }
 
     private function calculateProductionProgress(ProductionPlan $plan): int
@@ -48,7 +46,7 @@ class HistoryController extends Controller
         switch ($plan->status) {
             case 'disetujui':
                 return 50;
-            case 'menunggu persetujuan':
+            case 'menunggu_persetujuan': // Sesuaikan dengan data Anda
                 return 25;
             case 'dibuat':
                 return 10;
