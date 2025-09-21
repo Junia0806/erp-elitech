@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ProductionPlan;
 use Carbon\Carbon; 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -45,10 +46,10 @@ class CheckoutController extends Controller
             DB::transaction(function () use ($request) {
                 // 1. Buat entri utama di tabel 'production_plans'
                 $plan = ProductionPlan::create([
-                    'status'    => 'Dibuat', // Status awal sesuai ENUM di database Anda
-                    'deadline' => $request->input('deadline'),
-                    'notes'     => $request->input('notes') ?? '-',
-                    'created_by' => 1, // $auth()->id Mengambil ID user yang sedang login
+                    'status'        => 'Dibuat', // Status awal sesuai ENUM di database Anda
+                    'deadline'      => $request->input('deadline'),
+                    'ppic_note'     => $request->input('notes') ?? '-',
+                    'created_by'    => Auth::id(), // $auth()->id Mengambil ID user yang sedang login
                 ]);
 
                 // 2. Siapkan data untuk method attach()

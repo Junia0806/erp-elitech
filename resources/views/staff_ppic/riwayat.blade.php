@@ -18,7 +18,7 @@
                         'sku' => $p->sku ?? 'N/A',
                         'target' => $p->pivot->quantity ?? 0,
                     ]),
-                    'info' => $plan->notes ?? '-'
+                    'info' => $plan->ppic_note ?? '-'
                 ];
             })) }},
             openSubmissionId: null,

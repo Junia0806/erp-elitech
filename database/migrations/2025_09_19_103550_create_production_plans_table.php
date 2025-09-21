@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users');
             $table->enum('status', ['dibuat', 'menunggu_persetujuan', 'disetujui', 'ditolak'])->default('dibuat');
             $table->string('deadline')->nullable();
-            $table->text('notes')->nullable();
+            $table->text('ppic_note')->nullable();
+            $table->text('prod_note')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users');
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();

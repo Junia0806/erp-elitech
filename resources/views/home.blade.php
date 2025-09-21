@@ -32,7 +32,7 @@
                 </div>
                 <h3 class="text-2xl font-bold text-slate-800 mb-2">Staff PPIC</h3>
                 <p class="text-slate-500 mb-8 flex-grow">Mengajukan rencana produksi, memantau stok, dan memastikan jadwal produksi berjalan lancar.</p>
-                <a href="/ppic/choose-item" class="w-full bg-sky-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors">
+                <a href="{{ route('ppic.login.index') }}" class="w-full bg-sky-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors">
                     Masuk sebagai PPIC
                 </a>
             </div>
@@ -46,7 +46,7 @@
                 </div>
                 <h3 class="text-2xl font-bold text-slate-800 mb-2">Manajer</h3>
                 <p class="text-slate-500 mb-8 flex-grow">Memverifikasi pengajuan, memantau riwayat produksi, dan mengambil keputusan strategis.</p>
-                <a href="/verifikasi" class="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
+                <a href="{{ route('produksi.login.index') }}" class="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
                     Masuk sebagai Manajer
                 </a>
             </div>
@@ -60,7 +60,7 @@
                 </div>
                 <h3 class="text-2xl font-bold text-slate-800 mb-2">Staff Produksi</h3>
                 <p class="text-slate-500 mb-8 flex-grow">Mengerjakan tugas produksi, memperbarui status pekerjaan, dan membuat laporan hasil aktual.</p>
-                <a href="/produksi" class="w-full bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors">
+                <a href="{{ route('produksi.login.index') }}" class="w-full bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors">
                     Masuk sebagai Produksi
                 </a>
             </div>

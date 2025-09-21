@@ -24,7 +24,6 @@ class ProductionOrderSeeder extends Seeder
             ProductionOrder::create([
                 'production_plan_id' => $approvedPlan->id,
                 'status' => 'menunggu', // Status awal untuk order baru
-                'notes' => 'Order dibuat dari seeder, siap untuk produksi.',
             ]);
         }
     }

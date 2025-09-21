@@ -7,7 +7,91 @@
 
 @section('content')
 <div 
-    x-data="productionStaff()"
+   x-data="{
+        productionPlans: {{ json_encode($tasks) }},
+        isModalOpen: false,
+        isReportModalOpen: false,
+        selectedPlanId: null,
+        actionUrl: '',
+        newStatus: '',
+        reportInputs: [],
+        availableStatuses: ['Antri', 'Dikerjakan', 'Selesai'],
+        
+        get selectedPlan() {
+            if (!this.selectedPlanId) return null;
+            return this.productionPlans.find(p => p.id === this.selectedPlanId);
+        },
+
+        getStatusInfo(status) {
+            const statuses = {
+                'Antri': { percentage: 10, badgeClass: 'bg-slate-200 text-slate-700', progressClass: 'bg-slate-400' },
+                'Dikerjakan': { percentage: 50, badgeClass: 'bg-blue-200 text-blue-700', progressClass: 'bg-blue-500' },
+                'Selesai': { percentage: 100, badgeClass: 'bg-green-200 text-green-700', progressClass: 'bg-green-500' }
+            };
+            return statuses[status] || statuses['Antri'];
+        },
+
+        openUpdateModal(planId, url) {
+            this.selectedPlanId = planId;
+            this.actionUrl = url;
+            this.newStatus = this.selectedPlan.status;
+            this.isModalOpen = true;
+        },
+        
+        async updateStatus() {
+            if (!this.selectedPlanId || this.newStatus === this.selectedPlan.status) { this.isModalOpen = false; return; };
+            const csrfToken = document.querySelector('meta[name=\'csrf-token\']').getAttribute('content');
+            try {
+                const response = await fetch(this.actionUrl, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                    body: JSON.stringify({ status: this.newStatus })
+                });
+                if (!response.ok) throw new Error('Gagal memperbarui status.');
+                const result = await response.json();
+                const planIndex = this.productionPlans.findIndex(p => p.id === this.selectedPlanId);
+                if (planIndex > -1) this.productionPlans[planIndex].status = this.newStatus;
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: result.message, showConfirmButton: false, timer: 3000 });
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Terjadi kesalahan!', showConfirmButton: false, timer: 3000 });
+            } finally {
+                this.isModalOpen = false;
+            }
+        },
+        
+        openReportModal(planId, url) {
+            this.selectedPlanId = planId;
+            this.actionUrl = url;
+            this.reportInputs = JSON.parse(JSON.stringify(this.selectedPlan.production_plan.products)).map(p => ({
+                ...p,
+                hasil_produksi: p.pivot.quantity_actual || 0,
+                reject_produksi: p.pivot.quantity_reject || 0,
+            }));
+            this.isReportModalOpen = true;
+        },
+
+        async saveReport() {
+            if (!this.selectedPlanId) return;
+            const csrfToken = document.querySelector('meta[name=\'csrf-token\']').getAttribute('content');
+            const payload = { products: this.reportInputs.map(p => ({ id: p.id, hasil_produksi: p.hasil_produksi, reject_produksi: p.reject_produksi })) };
+            try {
+                const response = await fetch(this.actionUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error('Gagal menyimpan laporan.');
+                const result = await response.json();
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: result.message, showConfirmButton: false, timer: 3000 });
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Terjadi kesalahan!', showConfirmButton: false, timer: 3000 });
+            } finally {
+                this.isReportModalOpen = false;
+            }
+        }
+    }"
     class="bg-slate-50 min-h-screen font-sans"
 >
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -107,7 +107,7 @@
                                 <div>
                                     <h5 class="font-semibold text-slate-700 mb-2">Catatan dari PPIC</h5>
                                     <blockquote class="text-sm text-slate-700 italic border-l-4 border-slate-400 bg-slate-100 p-3 rounded-r-lg">
-                                        <p>{{ $plan->notes ?: 'Tidak ada catatan dari PPIC.' }}</p>
+                                        <p>{{ $plan->ppic_note ?: 'Tidak ada catatan dari PPIC.' }}</p>
                                     </blockquote>
                                 </div>
                                 
@@ -116,12 +116,12 @@
                                     @if($plan->status == 'disetujui')
                                         <blockquote class="text-sm text-green-800 italic border-l-4 border-green-500 bg-green-50 p-3 rounded-r-lg">
                                             {{-- Jika disetujui, ambil catatan dari order produksi. --}}
-                                            <p>{{ $plan->production_order?->notes ?: 'Disetujui tanpa catatan tambahan.' }}</p>
+                                            <p>{{ $plan->prod_note ?: 'Disetujui tanpa catatan tambahan.' }}</p>
                                         </blockquote>
                                     @else {{-- status 'ditolak' --}}
                                         <blockquote class="text-sm text-red-800 italic border-l-4 border-red-500 bg-red-50 p-3 rounded-r-lg">
                                             {{-- Jika ditolak, tampilkan alasan penolakan yang juga tersimpan di $plan->notes. --}}
-                                            <p>{{ $plan->notes ?: 'Tidak ada alasan penolakan yang diberikan.' }}</p>
+                                            <p>{{ $plan->prod_note ?: 'Tidak ada alasan penolakan yang diberikan.' }}</p>
                                         </blockquote>
                                     @endif
                                 </div>

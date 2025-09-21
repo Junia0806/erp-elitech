@@ -14,7 +14,6 @@ class ProductionOrder extends Model
     protected $fillable = [
         'production_plan_id',
         'status',
-        'notes',
         'quantity_actual',
         'quantity_reject',
         'completed_at',

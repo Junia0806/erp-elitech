@@ -21,11 +21,34 @@ class ProductionTaskController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // Back-end Mode: Keluarkan bentuk json
-        return response()->json($tasks, 200, [], JSON_PRETTY_PRINT);
+        // [LANGKAH UTAMA] Transformasi data menjadi array yang bersih untuk frontend
+        $formattedTasks = $tasks->map(function ($task) {
+            return [
+                'id' => $task->id,
+                'status' => $task->status,
+                'production_plan' => [
+                    'id' => $task->productionPlan->id,
+                    'deadline' => $task->productionPlan->deadline,
+                    'products' => $task->productionPlan->products->map(fn($p) => [
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'pivot' => [
+                            'quantity' => $p->pivot->quantity,
+                            'quantity_actual' => $p->pivot->quantity_actual,
+                            'quantity_reject' => $p->pivot->quantity_reject,
+                        ]
+                    ]),
+                ],
+                'logs' => $task->logs->map(fn($log) => [
+                    'description' => $log->description,
+                    'created_at' => $log->created_at->format('d M Y, H:i'),
+                    'user' => $log->user->name ?? 'Sistem',
+                ]),
+            ];
+        });
 
-        // Keluarkan data bersamaan dengan viewnya
-        // return view('view.name', compact('product'));
+        // Kirim data yang sudah diformat ke view
+        return view('staff_produksi.produksi', ['tasks' => $formattedTasks]);
     }
 
     /**

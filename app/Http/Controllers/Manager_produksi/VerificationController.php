@@ -8,6 +8,7 @@ use App\Models\ProductionPlan;
 use App\Models\ProductionOrder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class VerificationController extends Controller
 {
@@ -56,23 +57,23 @@ class VerificationController extends Controller
             DB::transaction(function () use ($request, $plan) {
                 if ($request->input('decision') == 'approve') {
                     // --- JIKA DISETUJUI ---
-                    $plan->status = 'disetujui';
-                    $plan->approved_by = 1; // auth()->id();ID Manajer yang login
+                    $plan->status      = 'disetujui';
+                    $plan->approved_by = Auth::id(); // auth()->id();ID Manajer yang login
                     $plan->approved_at = now();
+                    $plan->prod_note   = $request->input('notes') ?: '-'; // Simpan alasan penolakan
                     $plan->save();
 
                     // Buat entri baru di 'production_orders'
                     ProductionOrder::create([
                         'production_plan_id' => $plan->id,
                         'status' => 'menunggu', // Status awal untuk order
-                        'notes' => $request->input('notes'),
                     ]);
 
                 } else {
                     // --- JIKA DITOLAK ---
-                    $plan->status = 'ditolak';
-                    $plan->notes  = $request->input('notes') ?: '-'; // Simpan alasan penolakan
-                    $plan->approved_by = auth()->id();
+                    $plan->status      = 'ditolak';
+                    $plan->prod_note   = $request->input('notes') ?: '-'; // Simpan alasan penolakan
+                    $plan->approved_by = Auth::id();
                     $plan->approved_at = now();
                     $plan->save();
                 }

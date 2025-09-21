@@ -108,7 +108,7 @@
                                 <h5 class="text-md font-semibold text-slate-700 mb-2">Catatan dari PPIC:</h5>
                                 <blockquote
                                     class="text-sm text-slate-700 italic border-l-4 border-sky-400 bg-sky-50 p-4 rounded-r-lg">
-                                    <p>{{ $plan->notes ?: 'Tidak ada catatan.' }}</p>
+                                    <p>{{ $plan->ppic_note ?: 'Tidak ada catatan.' }}</p>
                                 </blockquote>
                             </div>
                         </div>

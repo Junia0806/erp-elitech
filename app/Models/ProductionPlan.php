@@ -19,7 +19,8 @@ class ProductionPlan extends Model
         'deadline',
         'approved_by',
         'approved_at',
-        'notes'
+        'ppic_note',
+        'prod_note'
     ];
 
     // Relasi: Plan ini milik satu Product
