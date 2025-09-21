@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Staff_ppic\ChooseItemController;
 use App\Http\Controllers\Staff_ppic\CheckoutController;
 use App\Http\Controllers\Staff_ppic\HistoryController;
+use App\Http\Controllers\Manager_produksi\VerificationController;
+use App\Http\Controllers\Manager_produksi\ManagerHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +27,7 @@ Route::get('/coba', function () {
     return view('staff_produksi.app');
 });
 
-//Staff PPIC
+//Staff PPIC (DONE)
 Route::get('/produk', function () {
     return view('staff_ppic.produk');
 });
@@ -38,7 +40,7 @@ Route::get('/riwayat', function () {
     return view('staff_ppic.riwayat');
 });
 
-////Manajer
+////Manajer (DONE)
 Route::get('/riwayat', function () {
     return view('staff_ppic.riwayat');
 });
@@ -62,30 +64,49 @@ Route::get('/laporan', function () {
 // ==================================================
 
 Route::prefix('ppic')->name('ppic.')->group(function () {
-    Route::resource('choose-item', ChooseItemController::class); // Pick-up Feature
     /*
-        Controller
+        Controller : ChooseItemController::class
         - INDEX : Menampilkan data barang
         - STORE : Menyimpan data pilihan menggunakan session
     */
+    Route::resource('choose-item', ChooseItemController::class); // Pick-up Feature
 
-    Route::resource('checkout', CheckoutController::class);  // Checkout Feature
     /*
-        Controller
+        Controller: CheckoutController::class
         - INDEX : Menampilkan data barang yang dipilih (dengan session)
         - STORE : Menyimpan dan membuat data production_plan
     */
+    Route::resource('checkout', CheckoutController::class);  // Checkout Feature
 
-    Route::resource('history', HistoryController::class);  // History Feature
     /*
-        Controller
+        Controller: HistoryController::class
         - INDEX : Menampilkan data history
     */
+    Route::resource('history', HistoryController::class);  // History Feature
 });
 
 Route::prefix('produksi')->name('produksi.')->group(function () {
-    // PLAN : Prefix between Manager and Staff
-        // Route::resource('nama_routes', "nama_controller"); // Manager Feature
-        // Route::resource('nama_routes', "nama_controller"); // Order List Feature
-        // Route::resource('nama_routes', "nama_controller"); // History Feature
+    // PREFIX: Manager Production Platform
+    Route::prefix('manager')->name('manager.')->group(function () {
+        /*
+            Controller: VerificationController::class
+            - INDEX : Menampilkan data yang harus diverifikasi.
+            - DECIDE: Membuat Work Order ketika di Approve, Menampilkan komentar dari Manager Produksi.
+        */
+        Route::resource('verification', VerificationController::class); // Manager Feature
+        Route::post('verification/{plan}/decide', [VerificationController::class, 'decide'])->name('verification.decide');
+
+        /*
+            Controller: ManagerHistoryController::class
+            - INDEX : Menampilkan data history.
+        */
+        Route::resource('history', ManagerHistoryController::class); // Order List Feature
+    });
+
+    // PREFIX: Staff Production Platform
+    Route::prefix('staff')->name('staff.')->group(function () {
+            // Route::resource('nama_routes', "nama_controller"); // Manager Feature
+            // Route::resource('nama_routes', "nama_controller"); // Order List Feature
+            // Route::resource('nama_routes', "nama_controller"); // History Feature
+    });
 });
