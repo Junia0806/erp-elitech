@@ -88,3 +88,4 @@ Route::prefix('produksi')->name('produksi.')->group(function () {
         // Route::resource('nama_routes', "nama_controller"); // Manager Feature
         // Route::resource('nama_routes', "nama_controller"); // Order List Feature
         // Route::resource('nama_routes', "nama_controller"); // History Feature
+});
