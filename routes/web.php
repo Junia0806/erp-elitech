@@ -108,11 +108,19 @@ Route::prefix('produksi')->name('produksi.')->group(function () {
     // PREFIX: Staff Production Platform
     Route::prefix('staff')->name('staff.')->group(function () {
         /*
-            Controller: VerificationController::class
-            - INDEX : Menampilkan data yang harus diverifikasi.
-            - DECIDE: Membuat Work Order ketika di Approve, Menampilkan komentar dari Manager Produksi.
+            Controller: StaffHistoryController::class
+            - INDEX : Menampilkan data history.
         */
         Route::get('reports', [StaffHistoryController::class, 'index'])->name('report.index');
-        Route::post('reports/generate', [ProductionReportController::class, 'generate'])->name('report.generate');
+
+        /*
+            Controller: ProductionTaskController::class
+            - INDEX : Menampilkan data tugas.
+            - STORE : Menyimpan data laporan aktual dan reject. 
+            - UPDATE: Mengubah status dan Menyimpan Log tersebut di Production_log.
+        */
+        Route::get('tasks', [ProductionTaskController::class, 'index'])->name('tasks.index');
+        Route::post('tasks/{task}', [ProductionTaskController::class, 'store'])->name('tasks.store');
+        Route::put('tasks/{task}', [ProductionTaskController::class, 'update'])->name('tasks.update');
     });
 });
