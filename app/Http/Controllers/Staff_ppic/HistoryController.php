@@ -17,7 +17,7 @@ class HistoryController extends Controller
         // Eager load relasi untuk optimasi:
         // - 'items.product': Mengambil item dalam rencana, dan detail produk untuk setiap item.
         // - 'productionOrder': Mengambil data order yang terkait.
-                $query = ProductionPlan::with(['products', 'productionOrder'])
+                $query = ProductionPlan::with(['products', 'productionOrder', 'creator'])
                                ->latest(); // Urutkan dari yang terbaru
 
         // 2. Eksekusi query untuk mendapatkan keseluruhan data
