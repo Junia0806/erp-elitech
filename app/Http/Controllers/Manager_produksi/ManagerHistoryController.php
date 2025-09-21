@@ -54,13 +54,13 @@ class ManagerHistoryController extends Controller
         });
 
         // Back-end Mode: Keluarkan bentuk json
-        return response()->json($plans, 200, [], JSON_PRETTY_PRINT);
+        // return response()->json($plans, 200, [], JSON_PRETTY_PRINT);
 
         // 6. Kirim data yang sudah diproses ke view
-        // return view('manager.history', [
-        //     'plans' => $plans,
-        //     'filterStatus' => $filterStatus // Kirim status filter untuk menandai tombol aktif di view
-        // ]);
+        return view('manajer.riwayat', [
+            'plans' => $plans,
+            'filterStatus' => $filterStatus // Kirim status filter untuk menandai tombol aktif di view
+        ]);
     }
 
     /**

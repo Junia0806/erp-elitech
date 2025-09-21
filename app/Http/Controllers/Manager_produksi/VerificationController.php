@@ -34,11 +34,11 @@ class VerificationController extends Controller
         });
 
         // Back-end Mode: Keluarkan bentuk json
-        return response()->json($plans, 200, [], JSON_PRETTY_PRINT);
+        // return response()->json($plans, 200, [], JSON_PRETTY_PRINT);
 
         // 3. Kirim data KOLEKSI (bukan JSON string) langsung ke view.
         //    Ini adalah praktik terbaik di Laravel.
-        // return view('coba_verifikasi', compact('plans'));
+        return view('manajer.verifikasi', compact('plans'));
     }
 
     /**
@@ -64,7 +64,7 @@ class VerificationController extends Controller
                     ProductionOrder::create([
                         'production_plan_id' => $plan->id,
                         'status' => 'menunggu', // Status awal untuk order
-                        'notes' => 'Disetujui oleh manajer. Siap untuk produksi.',
+                        'notes' => $request->input('notes'),
                     ]);
 
                 } else {
@@ -84,7 +84,7 @@ class VerificationController extends Controller
         $decisionMessage = $request->input('decision') === 'approve' ? 'disetujui' : 'ditolak';
 
         // Redirect kembali ke halaman verifikasi dengan pesan sukses
-        return redirect()->route('produksi.manager.verification.berhasil')
+        return redirect()->route('produksi.manager.history.index')
                          ->with('success', "Rencana produksi #{$plan->id} berhasil {$decisionMessage}.");
     }
 }
