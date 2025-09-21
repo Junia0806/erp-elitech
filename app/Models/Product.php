@@ -9,11 +9,14 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'sku', 'description'];
+    protected $fillable = ['name', 'sku', 'description', 'image'];
 
     // Relasi: Satu Product bisa memiliki banyak ProductionPlan
     public function productionPlans()
     {
-        return $this->hasMany(ProductionPlan::class);
+        // Tambahkan 'production_item' sebagai argumen kedua
+        return $this->belongsToMany(ProductionPlan::class, 'production_item')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
     }
 }

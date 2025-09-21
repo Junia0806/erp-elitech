@@ -14,17 +14,20 @@ class ProductionPlan extends Model
     protected $fillable = [
         'product_id',
         'created_by',
-        'quantity',
         'status',
         'deadline',
         'approved_by',
         'approved_at',
+        'notes'
     ];
 
     // Relasi: Plan ini milik satu Product
-    public function product()
+    public function products()
     {
-        return $this->belongsTo(Product::class);
+        // Tambahkan 'production_item' sebagai argumen kedua
+        return $this->belongsToMany(Product::class, 'production_item')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
     }
 
     // Relasi: Plan ini dibuat oleh satu User

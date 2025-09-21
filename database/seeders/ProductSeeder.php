@@ -22,6 +22,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Mesin frais CNC vertikal untuk pengerjaan logam presisi.',
                 'created_at' => now(),
                 'updated_at' => now(),
+                'image'      => null,
             ],
             [
                 'name' => 'CNC Lathe Machine',
@@ -29,6 +30,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Mesin bubut CNC untuk memproduksi komponen silindris.',
                 'created_at' => now(),
                 'updated_at' => now(),
+                'image'      => null,
             ],
             [
                 'name' => 'Manual Lathe Machine',
@@ -36,6 +38,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Mesin bubut manual konvensional serbaguna.',
                 'created_at' => now(),
                 'updated_at' => now(),
+                'image'      => null,
             ],
             [
                 'name' => 'Hydraulic Press Brake',
@@ -43,6 +46,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Mesin tekuk plat hidrolik untuk membentuk lembaran logam.',
                 'created_at' => now(),
                 'updated_at' => now(),
+                'image'      => null,
             ]
         ]);
     }
