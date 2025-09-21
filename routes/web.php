@@ -19,12 +19,13 @@ use App\Http\Controllers\Staff_ppic\HistoryController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 Route::get('/coba', function () {
-    return view('coba');
+    return view('staff_produksi.app');
 });
 
+//Staff PPIC
 Route::get('/produk', function () {
     return view('staff_ppic.produk');
 });
@@ -37,6 +38,26 @@ Route::get('/riwayat', function () {
     return view('staff_ppic.riwayat');
 });
 
+////Manajer
+Route::get('/riwayat', function () {
+    return view('staff_ppic.riwayat');
+});
+
+Route::get('/verifikasi', function () {
+    return view('manajer.verifikasi');
+});
+
+Route::get('/riwayat-manajer', function () {
+    return view('manajer.riwayat');
+});
+
+//Staff Produksi
+Route::get('/produksi', function () {
+    return view('staff_produksi.produksi');
+});
+Route::get('/laporan', function () {
+    return view('staff_produksi.laporan');
+});
 
 // ==================================================
 
@@ -67,4 +88,3 @@ Route::prefix('produksi')->name('produksi.')->group(function () {
         // Route::resource('nama_routes', "nama_controller"); // Manager Feature
         // Route::resource('nama_routes', "nama_controller"); // Order List Feature
         // Route::resource('nama_routes', "nama_controller"); // History Feature
-});
