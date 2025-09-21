@@ -9,7 +9,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'sku', 'description'];
+    protected $fillable = ['name', 'sku', 'description', 'image'];
 
     // Relasi: Satu Product bisa memiliki banyak ProductionPlan
     public function productionPlans()

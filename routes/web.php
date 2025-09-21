@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Staff PPIC
+use App\Http\Controllers\Staff_ppic\ChooseItemController;
+use App\Http\Controllers\Staff_ppic\CheckoutController;
+use App\Http\Controllers\Staff_ppic\HistoryController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,3 +37,34 @@ Route::get('/riwayat', function () {
     return view('staff_ppic.riwayat');
 });
 
+
+// ==================================================
+
+Route::prefix('ppic')->name('ppic.')->group(function () {
+    Route::resource('choose-item', ChooseItemController::class); // Pick-up Feature
+    /*
+        Controller
+        - INDEX : Menampilkan data barang
+        - STORE : Menyimpan data pilihan menggunakan session
+    */
+
+    Route::resource('checkout', CheckoutController::class);  // Checkout Feature
+    /*
+        Controller
+        - INDEX : Menampilkan data barang yang dipilih (dengan session)
+        - STORE : Menyimpan dan membuat data production_plan
+    */
+
+    Route::resource('history', HistoryController::class);  // History Feature
+    /*
+        Controller
+        - INDEX : Menampilkan data history
+    */
+});
+
+Route::prefix('produksi')->name('produksi.')->group(function () {
+    // PLAN : Prefix between Manager and Staff
+        // Route::resource('nama_routes', "nama_controller"); // Manager Feature
+        // Route::resource('nama_routes', "nama_controller"); // Order List Feature
+        // Route::resource('nama_routes', "nama_controller"); // History Feature
+});

@@ -14,11 +14,11 @@ class ProductionPlan extends Model
     protected $fillable = [
         'product_id',
         'created_by',
-        'quantity',
         'status',
         'deadline',
         'approved_by',
         'approved_at',
+        'notes'
     ];
 
     // Relasi: Plan ini milik satu Product

@@ -25,7 +25,8 @@ class ProductionPlanSeeder extends Seeder
         $approvedPlan = ProductionPlan::create([
             'created_by' => $ppicStaff->id,
             'status' => 'disetujui',
-            'deadline' => now()->addDays(7),
+            'deadline' => 7,
+            'notes'    => '-',
             'approved_by' => $manager->id,
             'approved_at' => now(),
         ]);
@@ -38,7 +39,9 @@ class ProductionPlanSeeder extends Seeder
         // Rencana 2: Dibuat dan masih menunggu persetujuan
         $pendingPlan = ProductionPlan::create([
             'created_by' => $ppicStaff->id,
+            'notes'    => '-',
             'status' => 'menunggu_persetujuan',
+            'deadline' => 7,
         ]);
 
         // Tempelkan 1 produk ke dalam rencana yang masih pending
