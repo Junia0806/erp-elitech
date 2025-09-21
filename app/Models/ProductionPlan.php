@@ -22,13 +22,6 @@ class ProductionPlan extends Model
         'notes'
     ];
 
-    public function getFormattedCreatedAtAttribute()
-    {
-        // 'created_at' secara otomatis adalah objek Carbon
-        // setLocale('id') untuk nama bulan dalam Bahasa Indonesia
-        return $this->created_at->locale('id')->isoFormat('D MMMM YYYY');
-    }
-
     // Relasi: Plan ini milik satu Product
     public function products()
     {

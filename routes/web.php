@@ -8,6 +8,8 @@ use App\Http\Controllers\Staff_ppic\CheckoutController;
 use App\Http\Controllers\Staff_ppic\HistoryController;
 use App\Http\Controllers\Manager_produksi\VerificationController;
 use App\Http\Controllers\Manager_produksi\ManagerHistoryController;
+use App\Http\Controllers\Staff_produksi\StaffHistoryController;
+use App\Http\Controllers\Staff_produksi\ProductionTaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,8 +107,12 @@ Route::prefix('produksi')->name('produksi.')->group(function () {
 
     // PREFIX: Staff Production Platform
     Route::prefix('staff')->name('staff.')->group(function () {
-            // Route::resource('nama_routes', "nama_controller"); // Manager Feature
-            // Route::resource('nama_routes', "nama_controller"); // Order List Feature
-            // Route::resource('nama_routes', "nama_controller"); // History Feature
+        /*
+            Controller: VerificationController::class
+            - INDEX : Menampilkan data yang harus diverifikasi.
+            - DECIDE: Membuat Work Order ketika di Approve, Menampilkan komentar dari Manager Produksi.
+        */
+        Route::get('reports', [StaffHistoryController::class, 'index'])->name('report.index');
+        Route::post('reports/generate', [ProductionReportController::class, 'generate'])->name('report.generate');
     });
 });
