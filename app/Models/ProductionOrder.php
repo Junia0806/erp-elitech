@@ -26,6 +26,11 @@ class ProductionOrder extends Model
         return $this->belongsTo(ProductionPlan::class);
     }
 
+    public function items()
+    {
+        return $this->hasMany(ProductionItem::class);
+    }
+
     // Relasi: Satu Order bisa memiliki banyak Log
     public function logs()
     {

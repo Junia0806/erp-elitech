@@ -17,6 +17,8 @@ public function up(): void
         $table->foreignId('production_plan_id')->constrained('production_plans')->onDelete('cascade');
         $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
         $table->integer('quantity');
+        $table->integer('quantity_actual')->nullable();
+        $table->integer('quantity_reject')->nullable();
         $table->timestamps();
     });
 }

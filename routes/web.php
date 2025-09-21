@@ -3,11 +3,15 @@
 use Illuminate\Support\Facades\Route;
 
 // Staff PPIC
+use App\Http\Controllers\PpicLoginController;
+use App\Http\Controllers\ProduksiLoginController;
 use App\Http\Controllers\Staff_ppic\ChooseItemController;
 use App\Http\Controllers\Staff_ppic\CheckoutController;
 use App\Http\Controllers\Staff_ppic\HistoryController;
 use App\Http\Controllers\Manager_produksi\VerificationController;
 use App\Http\Controllers\Manager_produksi\ManagerHistoryController;
+use App\Http\Controllers\Staff_produksi\StaffHistoryController;
+use App\Http\Controllers\Staff_produksi\ProductionTaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,30 +68,38 @@ Route::get('/laporan', function () {
 // ==================================================
 
 Route::prefix('ppic')->name('ppic.')->group(function () {
-    /*
-        Controller : ChooseItemController::class
-        - INDEX : Menampilkan data barang
-        - STORE : Menyimpan data pilihan menggunakan session
-    */
-    Route::resource('choose-item', ChooseItemController::class); // Pick-up Feature
+    Route::get('login', [PpicLoginController::class, 'index'])->name('login.index');
+    Route::post('authenticate', [PpicLoginController::class, 'authenticate'])->name('login.authenticate');
 
-    /*
-        Controller: CheckoutController::class
-        - INDEX : Menampilkan data barang yang dipilih (dengan session)
-        - STORE : Menyimpan dan membuat data production_plan
-    */
-    Route::resource('checkout', CheckoutController::class);  // Checkout Feature
+    Route::middleware(['ppic'])->group(function () {
+        /*
+            Controller : ChooseItemController::class
+            - INDEX : Menampilkan data barang
+            - STORE : Menyimpan data pilihan menggunakan session
+        */
+        Route::resource('choose-item', ChooseItemController::class); // Pick-up Feature
 
-    /*
-        Controller: HistoryController::class
-        - INDEX : Menampilkan data history
-    */
-    Route::resource('history', HistoryController::class);  // History Feature
+        /*
+            Controller: CheckoutController::class
+            - INDEX : Menampilkan data barang yang dipilih (dengan session)
+            - STORE : Menyimpan dan membuat data production_plan
+        */
+        Route::resource('checkout', CheckoutController::class);  // Checkout Feature
+
+        /*
+            Controller: HistoryController::class
+            - INDEX : Menampilkan data history
+        */
+        Route::resource('history', HistoryController::class);  // History Feature
+    });
 });
 
 Route::prefix('produksi')->name('produksi.')->group(function () {
+    Route::get('login', [ProduksiLoginController::class, 'index'])->name('login.index');
+    Route::post('authenticate', [ProduksiLoginController::class, 'authenticate'])->name('login.authenticate');
+
     // PREFIX: Manager Production Platform
-    Route::prefix('manager')->name('manager.')->group(function () {
+    Route::middleware('produksi.manager')->prefix('manager')->name('manager.')->group(function () {
         /*
             Controller: VerificationController::class
             - INDEX : Menampilkan data yang harus diverifikasi.
@@ -104,9 +116,21 @@ Route::prefix('produksi')->name('produksi.')->group(function () {
     });
 
     // PREFIX: Staff Production Platform
-    Route::prefix('staff')->name('staff.')->group(function () {
-            // Route::resource('nama_routes', "nama_controller"); // Manager Feature
-            // Route::resource('nama_routes', "nama_controller"); // Order List Feature
-            // Route::resource('nama_routes', "nama_controller"); // History Feature
+    Route::middleware('produksi.staff')->prefix('staff')->name('staff.')->group(function () {
+        /*
+            Controller: StaffHistoryController::class
+            - INDEX : Menampilkan data history.
+        */
+        Route::get('reports', [StaffHistoryController::class, 'index'])->name('report.index');
+
+        /*
+            Controller: ProductionTaskController::class
+            - INDEX : Menampilkan data tugas.
+            - STORE : Menyimpan data laporan aktual dan reject. 
+            - UPDATE: Mengubah status dan Menyimpan Log tersebut di Production_log.
+        */
+        Route::get('tasks', [ProductionTaskController::class, 'index'])->name('tasks.index');
+        Route::post('tasks/{task}', [ProductionTaskController::class, 'store'])->name('tasks.store');
+        Route::put('tasks/{task}', [ProductionTaskController::class, 'update'])->name('tasks.update');
     });
 });

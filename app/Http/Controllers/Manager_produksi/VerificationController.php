@@ -20,6 +20,7 @@ class VerificationController extends Controller
         //    dan belum diproses (disetujui/ditolak).
         $plans = ProductionPlan::with(['products', 'creator'])
             ->where('status', 'dibuat')
+            ->orWhere('status', 'menunggu_persetujuan')
             ->latest()
             ->get();
 
