@@ -47,7 +47,7 @@ Sebelum menjalankan proyek ini di lokal, pastikan laptop/PC sudah terinstal:
 8. Konfigurasi `DB_DATABASE` `DB_USERNAME` `DB_PASSWORD` di file .env
 9. Jalankan seeder database
 ```bash
-  php artisan migrate:fresh --seed
+  php artisan migrate --seed
 ```
 9. Buat link storage ke public directory
 ```bash
