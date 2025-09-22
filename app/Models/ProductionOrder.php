@@ -27,7 +27,8 @@ class ProductionOrder extends Model
 
     public function items()
     {
-        return $this->hasMany(ProductionItem::class);
+        // hasMany(RelatedModel, foreign_key_di_tabel_related, local_key_di_tabel_ini)
+        return $this->hasMany(ProductionItem::class, 'production_plan_id', 'production_plan_id');
     }
 
     // Relasi: Satu Order bisa memiliki banyak Log

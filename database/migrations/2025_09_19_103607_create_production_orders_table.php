@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             // Relasi 1-ke-1 dengan production_plans
             $table->foreignId('production_plan_id')->unique()->constrained('production_plans');
-            $table->enum('status', ['menunggu', 'sedang dikerjakan', 'selesai'])->default('menunggu');
+            $table->enum('status', ['menunggu','antri','dikerjakan', 'selesai'])->default('menunggu');
             $table->integer('quantity_actual')->nullable();
             $table->integer('quantity_reject')->nullable();
             $table->timestamp('completed_at')->nullable();

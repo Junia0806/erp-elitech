@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Staff_produksi;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductionOrder;
-use App\Models\ProductionLog; // Koreksi 2: Tambahkan model ProductionLog
+use App\Models\ProductionLog; 
+use App\Models\ProductionItem; 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Koreksi 2: Tambahkan facade Auth
-use Illuminate\Support\Facades\DB;   // Koreksi 2: Tambahkan facade DB
+use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\DB;   
+use Carbon\Carbon;
 
 class ProductionTaskController extends Controller
 {
@@ -17,37 +19,62 @@ class ProductionTaskController extends Controller
      */
     public function index()
     {
-        $tasks = ProductionOrder::with('productionPlan.products', 'logs.user')
-            ->orderBy('created_at', 'asc')
+        $tasks = ProductionOrder::with('productionPlan.products', 'logs.user', 'items')
+            ->orderBy('created_at', 'desc')
             ->get();
 
-        // [LANGKAH UTAMA] Transformasi data menjadi array yang bersih untuk frontend
         $formattedTasks = $tasks->map(function ($task) {
+            
+            $itemsLookup = $task->items->keyBy('product_id');
+
+            $estimasiSelesai = 'N/A';
+            if ($task->productionPlan->approved_at && is_numeric($task->productionPlan->deadline)) {
+                $estimasiSelesai = Carbon::parse($task->productionPlan->approved_at)
+                                          ->addDays((int)$task->productionPlan->deadline)
+                                          ->isoFormat('DD MMM YYYY');
+            }
+
+            // [MODIFIKASI] Memastikan history tidak pernah kosong
+            $history = $task->logs->map(function($log) {
+                preg_match("/menjadi '([^']*)'/", $log->description, $matches);
+                // Menggunakan status order saat ini sebagai fallback jika log tidak mengandung status
+                $statusName = $matches[1] ?? ucfirst(str_replace('_', ' ', $log->productionOrder->status));
+
+                return [
+                    'status' => $statusName,
+                    'timestamp' => $log->created_at->format('d M Y, H:i')
+                ];
+            });
+            // Jika tidak ada log sama sekali, buat history awal
+            if ($history->isEmpty()) {
+                $history->push([
+                    'status' => ucfirst(str_replace('_', ' ', $task->status)),
+                    'timestamp' => $task->created_at->format('d M Y, H:i')
+                ]);
+            }
+
             return [
                 'id' => $task->id,
-                'status' => $task->status,
-                'production_plan' => [
-                    'id' => $task->productionPlan->id,
-                    'deadline' => $task->productionPlan->deadline,
-                    'products' => $task->productionPlan->products->map(fn($p) => [
-                        'id' => $p->id,
-                        'name' => $p->name,
-                        'pivot' => [
-                            'quantity' => $p->pivot->quantity,
-                            'quantity_actual' => $p->pivot->quantity_actual,
-                            'quantity_reject' => $p->pivot->quantity_reject,
-                        ]
-                    ]),
-                ],
-                'logs' => $task->logs->map(fn($log) => [
-                    'description' => $log->description,
-                    'created_at' => $log->created_at->format('d M Y, H:i'),
-                    'user' => $log->user->name ?? 'Sistem',
-                ]),
+                'display_id' => 'RP' . str_pad($task->production_plan_id, 3, '0', STR_PAD_LEFT),
+                'estimasi_selesai' => $estimasiSelesai,
+                'status_produksi' => ucfirst(str_replace('_', ' ', $task->status)),
+                'info_ppic' => $task->productionPlan->ppic_note,
+                'catatan_manajer' => $task->productionPlan->prod_note,
+                'history' => $history,
+                'products' => $task->productionPlan->products->map(function($product) use ($itemsLookup) {
+                    $item = $itemsLookup->get($product->id);
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'sku' => $product->sku,
+                        'target' => $product->pivot->quantity,
+                        'hasil_produksi' => $item ? $item->quantity_actual : 0,
+                        'reject_produksi' => $item ? $item->quantity_reject : 0,
+                    ];
+                }),
             ];
         });
 
-        // Kirim data yang sudah diformat ke view
         return view('staff_produksi.produksi', ['tasks' => $formattedTasks]);
     }
 
@@ -63,25 +90,33 @@ class ProductionTaskController extends Controller
             // Ambil daftar produk yang direncanakan untuk mendapatkan targetnya
             $plannedProducts = $task->productionPlan->products;
 
-            // KOREKSI UTAMA: Loop dan buat data di `production_items`
-            foreach ($request->products as $productId => $quantities) {
-                $plannedProduct = $plannedProducts->find($productId);
-                if (!$plannedProduct) continue; // Lewati jika produk tidak ada dalam rencana
+                foreach ($request->products as $productData) {
+                    $productId = $productData['id'];
+                    $plannedProduct = $plannedProducts->get($productId);
 
-                $actual = $quantities['berhasil'] ?? 0;
-                $reject = $quantities['reject'] ?? 0;
+                    if (!$plannedProduct) continue; 
 
-                // Buat baris baru di tabel production_items
-                $task->items()->create([
-                    'product_id' => $productId,
-                    'quantity_target' => $plannedProduct->pivot->quantity, // Ambil target dari pivot plan
-                    'quantity_actual' => $actual,
-                    'quantity_reject' => $reject,
-                ]);
+                    $actual = $productData['hasil_produksi'];
+                    $reject = $productData['reject_produksi'];
 
-                $totalActual += $actual;
-                $totalReject += $reject;
-            }
+                    // Gunakan model ProductionItem secara langsung untuk updateOrCreate
+                    // karena relasi items() dari ProductionOrder adalah hasManyThrough (read-only)
+                    ProductionItem::updateOrCreate(
+                        [
+                            'production_plan_id' => $task->production_plan_id,
+                            'product_id'         => $productId,
+                        ],
+                        [
+                            // Sesuaikan nama kolom dengan tabel Anda ('quantity' bukan 'quantity_target')
+                            'quantity'          => $plannedProduct->pivot->quantity,
+                            'quantity_actual'   => $actual,
+                            'quantity_reject'   => $reject,
+                        ]
+                    );
+
+                    $totalActual += $actual;
+                    $totalReject += $reject;
+                }
 
             // Update total di tabel production_orders (tetap sama)
             $task->update([
@@ -92,13 +127,14 @@ class ProductionTaskController extends Controller
             // Buat log (tetap sama)
             ProductionLog::create([
                 'production_order_id' => $task->id,
-                'user_id' => 3, // Auth::id(),
+                'user_id' => Auth::id(),
                 'description' => "Laporan aktual disimpan. Total Berhasil: {$totalActual}, Total Reject: {$totalReject}.",
             ]);
         });
 
         // 4. Redirect: Arahkan kembali pengguna ke halaman daftar tugas dengan pesan sukses!
-        return redirect()->route('task.index')->with('success', 'Laporan #' . $task->id . ' berhasil disimpan.');
+        return response()->json(['message' => 'Laporan #' . $task->id .' berhasil ditambahkan!']);
+        // return redirect()->route('produksi.staff.tasks.index')->with('success', 'Laporan #' . $task->id . ' berhasil disimpan.');
     }
 
     /**
@@ -108,25 +144,30 @@ class ProductionTaskController extends Controller
     public function update(Request $request, ProductionOrder $task)
     {
         $oldStatus = $task->status;
-        $newStatus = $request->status;
+        $newStatusFromRequest = $request->status;
 
-            DB::transaction(function () use ($task, $oldStatus, $newStatus) {
-                // 1. Update status di ProductionOrder
-                $task->status = $newStatus;
-                if ($newStatus === 'selesai') {
-                    $task->completed_at = now();
-                }
-                $task->save();
+        // [INI SOLUSINYA] Terjemahkan status dari format frontend ke format database
+        // Contoh: "Dikerjakan" -> "dikerjakan"
+        $newStatusForDb = strtolower($newStatusFromRequest);
 
-                // 2. Buat log perubahan
-                ProductionLog::create([
-                    'production_order_id' => $task->id,
-                    'user_id' => 3, //Auth::id(),
-                    'description' => "Status diubah dari '{$oldStatus}' menjadi '{$newStatus}'.",
-                ]);
-            }); // Koreksi 5: Tambahkan penutup transaksi
+        DB::transaction(function () use ($task, $oldStatus, $newStatusForDb, $newStatusFromRequest) {
+            // 2. Update status di ProductionOrder menggunakan format database
+            $task->status = $newStatusForDb;
+            
+            // 3. Gunakan format frontend untuk perbandingan dan logging
+            if ($newStatusFromRequest == 'Selesai') {
+                $task->completed_at = now();
+            }
+            $task->save();
 
-        // Koreksi 6: Method harus mengembalikan response Status #RP006 berhasil diperbarui!
-        return redirect()->back()->with('success', 'Status #' . $task->id .' berhasil diperbarui!');
+            // 4. Buat log perubahan menggunakan format yang mudah dibaca
+            ProductionLog::create([
+                'production_order_id' => $task->id,
+                'user_id' => Auth::id(),
+                'description' => "Status diubah dari '{$oldStatus}' menjadi '{$newStatusFromRequest}'.",
+            ]);
+        });
+
+        return response()->json(['message' => 'Status #' . $task->id .' berhasil diperbarui!']);
     }
 }

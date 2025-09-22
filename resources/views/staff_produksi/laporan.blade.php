@@ -4,7 +4,7 @@
 
 @section('content')
 <div 
-    x-data="productionReport()"
+    x-data="productionReport({{ json_encode($orders) }})"
     class="bg-slate-50 min-h-screen font-sans"
 >
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -210,14 +210,9 @@
 </style>
 
 <script>
-    function productionReport() {
+function productionReport(orders) {
         return {
-            // Data mentah, asumsikan ini didapat dari database
-            allPlans: [
-                { id: 'RP002', estimasi_selesai: '23 Sep 2025', tanggal_selesai: '2025-09-20', status_produksi: 'Selesai', ppic_staff: 'Rina Putri', manajer: 'Budi Santoso', info_ppic: 'Kebutuhan mendesak.', catatan_manajer: null, products: [ { name: 'Celana Chino Slim Fit', sku: 'CCSF-001', target: 150, hasil_produksi: 148, reject_produksi: 2 } ] },
-                { id: 'RP004', estimasi_selesai: '17 Sep 2025', tanggal_selesai: '2025-09-17', status_produksi: 'Selesai', ppic_staff: 'Andi Wijaya', manajer: 'Budi Santoso', info_ppic: 'Klien butuh cepat.', catatan_manajer: 'OK.', products: [ { name: 'Polo Shirt', sku: 'PS-002', target: 200, hasil_produksi: 200, reject_produksi: 0 } ] },
-                 { id: 'RP001', estimasi_selesai: '04 Okt 2025', tanggal_selesai: null, status_produksi: 'Dikerjakan', ppic_staff: 'Andi Wijaya', manajer: 'Budi Santoso', info_ppic: 'Prioritas tinggi.', catatan_manajer: 'Segera proses.', products: [ { name: 'Kemeja Lengan Panjang', sku: 'KMLP-001', target: 100, hasil_produksi: 0, reject_produksi: 0 } ] },
-            ],
+            allPlans: orders, // Gunakan data dari controller
             reportType: 'per_order',
             selectedPlanId: '',
             startDate: '',
@@ -229,6 +224,7 @@
                 return this.allPlans.filter(p => p.status_produksi === 'Selesai');
             },
 
+            // ... (Fungsi generateReport dan printReport tidak perlu diubah)
             generateReport() {
                 this.reportData = null;
                 this.errorMessage = '';
@@ -257,6 +253,7 @@
                     const end = new Date(this.endDate);
                     
                     const plans = this.completedPlans.filter(p => {
+                        if (!p.tanggal_selesai) return false;
                         const tglSelesai = new Date(p.tanggal_selesai);
                         return tglSelesai >= start && tglSelesai <= end;
                     });

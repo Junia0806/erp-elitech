@@ -121,7 +121,7 @@ Route::prefix('produksi')->name('produksi.')->group(function () {
             Controller: StaffHistoryController::class
             - INDEX : Menampilkan data history.
         */
-        Route::get('reports', [StaffHistoryController::class, 'index'])->name('report.index');
+        Route::get('reports', [StaffHistoryController::class, 'index'])->name('reports.index');
 
         /*
             Controller: ProductionTaskController::class
