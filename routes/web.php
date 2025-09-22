@@ -2,6 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Staff PPIC
+use App\Http\Controllers\PpicLoginController;
+use App\Http\Controllers\ProduksiLoginController;
+use App\Http\Controllers\Staff_ppic\ChooseItemController;
+use App\Http\Controllers\Staff_ppic\CheckoutController;
+use App\Http\Controllers\Staff_ppic\HistoryController;
+use App\Http\Controllers\Manager_produksi\VerificationController;
+use App\Http\Controllers\Manager_produksi\ManagerHistoryController;
+use App\Http\Controllers\Staff_produksi\StaffHistoryController;
+use App\Http\Controllers\Staff_produksi\ProductionTaskController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,12 +25,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 Route::get('/coba', function () {
-    return view('coba');
+    return view('staff_produksi.app');
 });
 
+//Staff PPIC (DONE)
 Route::get('/produk', function () {
     return view('staff_ppic.produk');
 });
@@ -32,3 +44,93 @@ Route::get('/riwayat', function () {
     return view('staff_ppic.riwayat');
 });
 
+////Manajer (DONE)
+Route::get('/riwayat', function () {
+    return view('staff_ppic.riwayat');
+});
+
+Route::get('/verifikasi', function () {
+    return view('manajer.verifikasi');
+});
+
+Route::get('/riwayat-manajer', function () {
+    return view('manajer.riwayat');
+});
+
+//Staff Produksi
+Route::get('/produksi', function () {
+    return view('staff_produksi.produksi');
+});
+Route::get('/laporan', function () {
+    return view('staff_produksi.laporan');
+});
+
+// ==================================================
+
+Route::prefix('ppic')->name('ppic.')->group(function () {
+    Route::get('login', [PpicLoginController::class, 'index'])->name('login.index');
+    Route::post('authenticate', [PpicLoginController::class, 'authenticate'])->name('login.authenticate');
+
+    Route::middleware(['ppic'])->group(function () {
+        /*
+            Controller : ChooseItemController::class
+            - INDEX : Menampilkan data barang
+            - STORE : Menyimpan data pilihan menggunakan session
+        */
+        Route::resource('choose-item', ChooseItemController::class); // Pick-up Feature
+
+        /*
+            Controller: CheckoutController::class
+            - INDEX : Menampilkan data barang yang dipilih (dengan session)
+            - STORE : Menyimpan dan membuat data production_plan
+        */
+        Route::resource('checkout', CheckoutController::class);  // Checkout Feature
+
+        /*
+            Controller: HistoryController::class
+            - INDEX : Menampilkan data history
+        */
+        Route::resource('history', HistoryController::class);  // History Feature
+    });
+});
+
+Route::prefix('produksi')->name('produksi.')->group(function () {
+    Route::get('login', [ProduksiLoginController::class, 'index'])->name('login.index');
+    Route::post('authenticate', [ProduksiLoginController::class, 'authenticate'])->name('login.authenticate');
+
+    // PREFIX: Manager Production Platform
+    Route::middleware('produksi.manager')->prefix('manager')->name('manager.')->group(function () {
+        /*
+            Controller: VerificationController::class
+            - INDEX : Menampilkan data yang harus diverifikasi.
+            - DECIDE: Membuat Work Order ketika di Approve, Menampilkan komentar dari Manager Produksi.
+        */
+        Route::resource('verification', VerificationController::class); // Manager Feature
+        Route::post('verification/{plan}/decide', [VerificationController::class, 'decide'])->name('verification.decide');
+
+        /*
+            Controller: ManagerHistoryController::class
+            - INDEX : Menampilkan data history.
+        */
+        Route::resource('history', ManagerHistoryController::class); // Order List Feature
+    });
+
+    // PREFIX: Staff Production Platform
+    Route::middleware('produksi.staff')->prefix('staff')->name('staff.')->group(function () {
+        /*
+            Controller: StaffHistoryController::class
+            - INDEX : Menampilkan data history.
+        */
+        Route::get('reports', [StaffHistoryController::class, 'index'])->name('reports.index');
+
+        /*
+            Controller: ProductionTaskController::class
+            - INDEX : Menampilkan data tugas.
+            - STORE : Menyimpan data laporan aktual dan reject. 
+            - UPDATE: Mengubah status dan Menyimpan Log tersebut di Production_log.
+        */
+        Route::get('tasks', [ProductionTaskController::class, 'index'])->name('tasks.index');
+        Route::post('tasks/{task}', [ProductionTaskController::class, 'store'])->name('tasks.store');
+        Route::put('tasks/{task}', [ProductionTaskController::class, 'update'])->name('tasks.update');
+    });
+});
