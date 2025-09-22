@@ -1,5 +1,3 @@
-<p align="center"><a href="#"_blank"><img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fid.linkedin.com%2Fcompany%2Felitechtechnovision&psig=AOvVaw1OljRGpVB4CI4ZZnQK9AMb&ust=1758611622386000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLDRpvvo648DFQAAAAAdAAAAABAE" width="400" alt="Elitech Logo"></a></p>
-
 <h1 align="center"><b>ERP Elitech</b></h1>
 
 <p align="center">
@@ -9,20 +7,32 @@
 
 ---
 
-## 🚀 Ringkasan
-**ERP Elitech** adalah aplikasi berbasis web untuk membantu pengelolaan rencana dan laporan produksi.  
-Sistem ini menyediakan alur kerja yang jelas mulai dari perencanaan, persetujuan, hingga eksekusi produksi.
+## Ringkasan
+- **Staff PPIC**: membuat rencana produksi dan melihat riwayat laporan.  
+- **Manajer**: memvalidasi rencana (setuju/tolak).  
+- **Staff Produksi**: memperbarui status produksi yang disetujui manajer dan melaporkan hasil aktual.  
 
 ---
 
+## 🖥️ Prasyarat
+Sebelum menjalankan proyek ini di lokal, pastikan laptop/PC sudah terinstal:
+- [Visual Studio Code](https://code.visualstudio.com/)  
+- [Laragon](https://laragon.org/) (atau XAMPP, tapi proyek ini dikembangkan dengan **Laragon**)  
+- [Composer](https://getcomposer.org/)  
+- [Node.js & NPM](https://nodejs.org/)  
+- MySQL Database  
+- PHP ≥ 8.1  
+- Laravel 10  
+
+---
 ## Instalasi / Cara menjalankan di lokal
 1. Clone proyek
 ```bash
   git clone https://github.com/Junia0806/erp-elitech.git
 ```
-2. Jalankan composer update
+2. Jalankan composer 
 ```bash
-  composer update
+  composer install
 ```
 3. Instal library menggunakan npm
 ```bash
@@ -43,11 +53,11 @@ Sistem ini menyediakan alur kerja yang jelas mulai dari perencanaan, persetujuan
 ```bash
   php artisan storage:link
 ```
-10. Jalankan node runtime
+10. Jalankan node runtime (di vscode)
 ```bash
   npm run dev
 ```
-11. Jalankan proyek Laravel
+11. Jalankan proyek Laravel (di terminal laragon)
 ```bash
   php artisan serve
 ```
